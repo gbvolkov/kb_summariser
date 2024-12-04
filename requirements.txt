@@ -1,0 +1,27 @@
+--trusted-host pypi.org
+--trusted-host files.pythonhosted.org
+
+
+#yandex_chain
+#playwright>=1.35.0
+#beautifulsoup4>=4.12.2
+#aiofiles>=23.2.0
+#markdownify>=0.9.3  # If integrating markdownify
+python-dotenv
+#lxml
+#html2text
+pandas
+transformers
+torch
+#requests
+langchain_openai
+langchain_gigachat
+langchain_community
+langchainhub
+langchain-huggingface
+langchain_google_genai
+langchain_mistralai
+
+nltk
+
+json-repair
