@@ -1,7 +1,7 @@
 --trusted-host pypi.org
 --trusted-host files.pythonhosted.org
 
-
+ipywidgets
 #yandex_chain
 #playwright>=1.35.0
 #beautifulsoup4>=4.12.2

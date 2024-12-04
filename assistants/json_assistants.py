@@ -10,7 +10,7 @@ import config
 from langchain_openai import ChatOpenAI
 from langchain_mistralai import ChatMistralAI
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.chat_models.gigachat import GigaChat
+from langchain_gigachat import GigaChat
 #from yandex_chain import YandexLLM
 from langchain_community.llms import YandexGPT
 #from langchain_community.llms import YandexGPT
@@ -35,6 +35,7 @@ class JSONAssistant:
         logger.info("Initialized")
 
     def set_system_prompt(self):
+        logger.info("set rag chain")
         self.rag_chain = self.llm.with_structured_output(self.schema)
 
     @abstractmethod
@@ -49,8 +50,15 @@ class JSONAssistant:
             raise ValueError("Model or RAG chain not initialized.")
         try:
             #show_retrieved_documents(self.vectorstore, self.retriever, query)
-            result = self.rag_chain.invoke(query)
-            return result.json()
+            cattempts = 0
+            while cattempts < 3:
+                cattempts += 1
+                try:
+                    result = self.rag_chain.invoke(query)
+                    return result.json()
+                except Exception as e:
+                    logger.error(f"Error in ask_question: {str(e)}")
+            raise
         except AttributeError as e:
             logger.error(f"AttributeError in ask_question: {str(e)}")
             raise ValueError(f"Error processing query: {str(e)}") from e
@@ -95,7 +103,8 @@ class JSONAssistantSber(JSONAssistant):
         return {"user_id": user_id, "secret": secret}
     def initialize(self):
         return GigaChat(
-            credentials=self.generate_auth_data(config.GIGA_CHAT_USER_ID, config.GIGA_CHAT_SECRET), 
+            credentials=config.GIGA_CHAT_AUTH, 
+            model="GigaChat-Pro",
             verify_ssl_certs=False,
             temperature=0.4,
             scope = config.GIGA_CHAT_SCOPE)
@@ -121,6 +130,7 @@ if __name__ == '__main__':
     from pydantic import BaseModel, Field
 
     class Procurement(BaseModel):
+        """Procurement data"""
         supplier: Optional[str] = Field(default=None)
         good: Optional[str] = Field(default=None)
         good_volume: Optional[str] = Field(default=None)
@@ -128,6 +138,7 @@ if __name__ == '__main__':
         supply_cost: Optional[str] = Field(default=None)
 
     class Shipment(BaseModel):
+        """Shipment data"""
         shipment_date: Optional[str] = Field(default=None)
         shipment_time: Optional[str] = Field(default=None)
         customer_name: Optional[str] = Field(default=None)
@@ -141,9 +152,11 @@ if __name__ == '__main__':
         procurements: Optional[List[Procurement]] = Field(default=None)
 
     class Shipments(BaseModel):
+        """List of shipments"""
         shipments: List[Shipment] = Field(description="List of shipments")
 
-    assistant = JSONAssistantGPT(schema=Shipments)
+
+    assistant = JSONAssistantSber(schema=Shipments)
     text = " вот смотрите Георгий получается ну вот как бы мне нужно дать задание боту чтобы он бот запомни отгрузку создай новую отгрузку на 14.00 7 ноября по адресу ярославская шоссе дом 114 везем организации мастер строй тощи бетон марки 220 кубов по 4850 рублей одна доставка по 7 тысяч от организации евробетон потом дополнительно вторая ну вторая например и добавь туда закупку везем от организации авира строй везем марку 220 кубов по такой-то цени и так далее"
     result = assistant.ask_question(text)
     print(result)
