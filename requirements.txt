@@ -23,6 +23,7 @@ langchainhub
 langchain-huggingface
 langchain_google_genai
 langchain_mistralai
+yandexcloud
 faiss-cpu
 
 nltk

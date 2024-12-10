@@ -61,7 +61,7 @@ class JSONAssistant:
                 except Exception as e:
                     logger.error(f"Error in ask_question: {str(e)}")
                     err_str = f"Error in ask_question: {str(e)}"
-                    time.sleep(1)
+                    time.sleep(1.1)
             raise ValueError(err_str)
         except AttributeError as e:
             logger.error(f"AttributeError in ask_question: {str(e)}")

@@ -130,6 +130,7 @@ def get_summaries_generator():
 
     sber_assistant = SimpleAssistantSber(prompt)
     structured = JSONAssistantMistralAI(Terms)
+    structured_gpt = JSONAssistantGPT(Terms)
     gpt_assistant = SimpleAssistantGPT(prompt)
 
     parser = JsonOutputParser(pydantic_object=Summary)
@@ -138,7 +139,10 @@ def get_summaries_generator():
         cleaned_refs = cleanup_text(refs)
         
         # Extracts list of terms from the document
-        json_string = structured.ask_question(cleaned_refs)
+        try:
+            json_string = structured.ask_question(cleaned_refs)
+        except Exception as e:
+            json_string = structured_gpt.ask_question(cleaned_refs)
         list_of_terms = json.loads(json_string)
         list_of_terms['terms'] = [item for item in list_of_terms['terms'] if item['term'] is not None]
         docs = []
@@ -155,7 +159,7 @@ def get_summaries_generator():
         }
         # Generates list of topics and summaries
         try:
-            summary_txt = sber_assistant.ask_question(query)
+            summary_txt = gpt_assistant.ask_question(query)
             summary = parser.parse(summary_txt)
         except Exception as e:
             summary_txt = gpt_assistant.ask_question(query)

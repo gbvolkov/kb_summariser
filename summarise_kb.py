@@ -167,11 +167,11 @@ def process_csv(input_path, output_path, chunk_size=4096, overlap=0.35, skiprows
                     new_row['refs'] = text_chunk
                     #print(f'for Record NO: {chunk['no'].iloc[0]}: {problem}: {solution}')
                     processed_df = pd.concat([processed_df, new_row], ignore_index=True)
-            idx += 1
             processed_df.to_csv(output_path, mode='a', index=False, header=not pd.io.common.file_exists(output_path))
             #print(chunk['no'].iloc[0])
             with open('./data/summariser.idx', 'w', encoding='utf-8') as f:
                 f.write(f'{idx}')
+            idx += 1
 
 async def main():
     idx = 1
