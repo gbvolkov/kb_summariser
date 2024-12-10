@@ -13,10 +13,10 @@ from langchain_openai import ChatOpenAI
 from langchain_mistralai import ChatMistralAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_gigachat import GigaChat
-#from yandex_chain import YandexLLM
 from langchain_community.llms import YandexGPT
-#from langchain_community.llms import YandexGPT
-
+from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate
+#from langchain_core.prompts import MessagesPlaceholder
+from langchain.schema import SystemMessage, HumanMessage
 
 from abc import abstractmethod
 from typing import List, Any, Optional, Dict, Tuple
@@ -41,8 +41,11 @@ class SimpleAssistant:
         logger.info("Initialized")
 
     def set_system_prompt(self, prompt: str):
-        self.system_prompt = prompt
-
+        #self.system_prompt = SystemMessage(content=prompt)
+        self.system_prompt = ChatPromptTemplate.from_messages([
+            SystemMessagePromptTemplate.from_template(prompt),
+            ChatPromptTemplate.from_template('{query}')
+            ])
 
     @abstractmethod
     def initialize(self):
@@ -50,12 +53,13 @@ class SimpleAssistant:
             Initialize model here.
         """
 
-    def ask_question(self, query: str) -> str:
+    def ask_question(self, query: Dict) -> str:
         if self.llm is None:
             logger.error("RAG chain not initialized")
             raise ValueError("Model or RAG chain not initialized.")
         try:
-            result = self.llm.invoke(query)
+            chain = self.system_prompt | self.llm
+            result = chain.invoke(query)
             return result.content
         except AttributeError as e:
             logger.error(f"AttributeError in ask_question: {str(e)}")
@@ -103,6 +107,7 @@ class SimpleAssistantSber(SimpleAssistant):
         return GigaChat(
             credentials=config.GIGA_CHAT_AUTH, 
             model="GigaChat-Pro",
+            #model="GigaChat",
             verify_ssl_certs=False,
             temperature=0.4,
             scope = config.GIGA_CHAT_SCOPE)

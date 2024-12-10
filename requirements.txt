@@ -11,6 +11,8 @@ python-dotenv
 #lxml
 #html2text
 pandas
+openpyxl
+
 transformers
 torch
 #requests
@@ -21,6 +23,7 @@ langchainhub
 langchain-huggingface
 langchain_google_genai
 langchain_mistralai
+faiss-cpu
 
 nltk
 

@@ -1,4 +1,5 @@
 import os
+import time
 
 # Add the parent directory to sys.path
 if __name__ == '__main__':
@@ -35,8 +36,8 @@ class JSONAssistant:
         logger.info("Initialized")
 
     def set_system_prompt(self):
-        logger.info("set rag chain")
-        self.rag_chain = self.llm.with_structured_output(self.schema)
+        logger.info("set structured chain")
+        self.chain = self.llm.with_structured_output(self.schema)
 
     @abstractmethod
     def initialize(self):
@@ -45,20 +46,23 @@ class JSONAssistant:
         """
 
     def ask_question(self, query: str) -> str:
-        if self.rag_chain is None:
+        err_str = ''
+        if self.chain is None:
             logger.error("RAG chain not initialized")
             raise ValueError("Model or RAG chain not initialized.")
         try:
             #show_retrieved_documents(self.vectorstore, self.retriever, query)
             cattempts = 0
-            while cattempts < 3:
+            while cattempts < 5:
                 cattempts += 1
                 try:
-                    result = self.rag_chain.invoke(query)
+                    result = self.chain.invoke(query)
                     return result.json()
                 except Exception as e:
                     logger.error(f"Error in ask_question: {str(e)}")
-            raise
+                    err_str = f"Error in ask_question: {str(e)}"
+                    time.sleep(1)
+            raise ValueError(err_str)
         except AttributeError as e:
             logger.error(f"AttributeError in ask_question: {str(e)}")
             raise ValueError(f"Error processing query: {str(e)}") from e
@@ -73,7 +77,7 @@ class JSONAssistantGPT(JSONAssistant):
     def initialize(self):
         return ChatOpenAI(
             model="gpt-4o-mini",
-            temperature=0.4)
+            temperature=0.1)
 
 
 class JSONAssistantMistralAI(JSONAssistant):
@@ -82,7 +86,7 @@ class JSONAssistantMistralAI(JSONAssistant):
     def initialize(self):
         return ChatMistralAI(
             model="mistral-large-latest",
-            temperature=0.4)
+            temperature=0.1)
 
 
 class JSONAssistantYA(JSONAssistant):
@@ -93,7 +97,7 @@ class JSONAssistantYA(JSONAssistant):
             api_key = config.YA_API_KEY, 
             folder_id=config.YA_FOLDER_ID, 
             model_uri=f'gpt://{config.YA_FOLDER_ID}/yandexgpt/latest',
-            temperature=0.4
+            temperature=0.1
             )
 
 class JSONAssistantSber(JSONAssistant):
@@ -105,6 +109,7 @@ class JSONAssistantSber(JSONAssistant):
         return GigaChat(
             credentials=config.GIGA_CHAT_AUTH, 
             model="GigaChat-Pro",
+            #model="GigaChat",
             verify_ssl_certs=False,
             temperature=0.4,
             scope = config.GIGA_CHAT_SCOPE)
@@ -116,7 +121,7 @@ class JSONAssistantGemini(JSONAssistant):
     def initialize(self):
         return ChatGoogleGenerativeAI(
             model="gemini-1.5-pro",
-            temperature=0.4,
+            temperature=0.1,
             google_api_key=config.GEMINI_API_KEY,
             top_p=0.95,
             top_k=40,
