@@ -13,12 +13,12 @@ def cleanup_text(text: str):
     return re.sub(r'##IMAGE##\s+\S+\.(png|jpg|jpeg|gif)', '', text)
 
 
-prompt = """Проанализируй текст. Верни OK, если текст содержит полезную информацию. Верни NOK, если текст не содержит полезхной информации. Всегда возвращай только одно слово OK или NOK.
+prompt = """Проанализируй текст. Верни OK, если текст содержит полезную информацию. Верни NOK, если текст не содержит полезной информации. Всегда возвращай только одно слово OK или NOK.
     """
 checker = SimpleAssistantGPT(prompt)
 
 write_header = True
-with pd.read_csv('./data/articles_data_summ.csv', chunksize=1, encoding="utf-8") as reader:
+with pd.read_csv('./data/articles_data_summ_cleaned.csv', chunksize=1, encoding="utf-8") as reader:
     idx = 0
     prev_refs = ''
     for chunk in reader:
@@ -36,7 +36,7 @@ with pd.read_csv('./data/articles_data_summ.csv', chunksize=1, encoding="utf-8")
         validated_row = chunk.copy()
         validated_row['validated'] = validation
         validated_row.to_csv(
-                './data/articles_data_summ_validated.csv',
+                './data/articles_data_summ_preprod.csv',
                 mode='w' if write_header else 'a',
                 header=write_header,
                 index=False
