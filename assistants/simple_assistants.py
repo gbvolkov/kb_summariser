@@ -146,7 +146,7 @@ class SimpleAssistantLocal(SimpleAssistant):
             torch_dtype = torch.float32
             device = "cpu"
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        model = AutoModelForCausalLM.from_pretrained(self.model_name, torch_dtype=torch.float16, trust_remote_code=True, device_map="auto")
+        model = AutoModelForCausalLM.from_pretrained(self.model_name, torch_dtype=torch_dtype, trust_remote_code=True, device_map="auto")
 
         generation_config = GenerationConfig.from_pretrained(self.model_name)
         generation_config.max_new_tokens = 1024
@@ -158,6 +158,7 @@ class SimpleAssistantLocal(SimpleAssistant):
         generation_config.pad_token_id=self.tokenizer.eos_token_id
 
         pipe = pipeline("text-generation", model=model, tokenizer=self.tokenizer, generation_config=generation_config)
+        logging.info(f'Using device: {pipe.device}')
         llm = HuggingFacePipeline(pipeline=pipe, model_kwargs={"temperature": 0.4})
         return llm
 
