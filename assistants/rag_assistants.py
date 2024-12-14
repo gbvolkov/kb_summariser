@@ -579,8 +579,8 @@ class RAGAssistantLocal(RAGAssistant):
         return self.truncate_input(context, available_tokens)
 
 class RAGAssistantGGUF(RAGAssistantLocal):
-    def __init__(self, system_prompt, kkb_path, model_name='models/mistral-large-instruct-2411-Q4_K_M'):
-        super().__init__(system_prompt, kkb_path, model_name)
+    def __init__(self, system_prompt, kkb_path, model_name='models/mistral-large-instruct-2411-Q4_K_M', output_parser = BaseOutputParser):
+        super().__init__(system_prompt, kkb_path, model_name, output_parser)
         
 
     def initialize(self):
