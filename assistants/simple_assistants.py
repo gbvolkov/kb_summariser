@@ -131,7 +131,7 @@ class SimpleAssistantGemini(SimpleAssistant):
         )
 
 class SimpleAssistantLocal(SimpleAssistant):
-    def __init__(self, system_prompt, model_name='models/llama3.1.8b'):
+    def __init__(self, system_prompt, model_name='/models/llama3.1.8b'):
         self.model_name = model_name
         self.max_new_tokens = 2000
         super().__init__(system_prompt)
@@ -182,7 +182,7 @@ if __name__ == '__main__':
 
     args = vars(parser.parse_args())
     mode = args['mode']
-    model = 'meta-llama/Llama-3.1-8B-Instruct'
+    model = '/models/llama3.1.8b'
     system_prompt = "Ты внимательный собеседник"
 
     if mode == 'query':

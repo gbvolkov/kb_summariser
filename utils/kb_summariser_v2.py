@@ -124,7 +124,7 @@ def get_summaries_generator():
     """
 
     #loading embedding model
-    embeddings = HuggingFaceEmbeddings(model_name='models/multilingual-e5-large')
+    embeddings = HuggingFaceEmbeddings(model_name='/models/multilingual-e5-large')
     #Creating vectore store for terms and definitions
     t_d_vs = FAISS.from_documents(dicts_to_documents(extract_terms_definitions(glossary)), embeddings)
 

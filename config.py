@@ -13,12 +13,12 @@ TARGET_URL = 'https://kb.ileasing.ru/space/a100dc8d-3af0-418c-8634-f09f1fdb06f2/
 USERNAME = '7810155'
 PASSWORD = os.environ.get('IL_PWD') 
 
-LOCAL_MODEL_NAME='data/Meta-Llama-3.1-8B-Instruct-Q8_0.gguf'
+LOCAL_MODEL_NAME='/models/Meta-Llama-3.1-8B-Instruct-Q8_0/Meta-Llama-3.1-8B-Instruct-Q8_0.gguf'
 
 #EMBEDDING_MODEL='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
 
 #EMBEDDING_MODEL='sentence-transformers/distiluse-base-multilingual-cased-v1'
-EMBEDDING_MODEL='models/multilingual-e5-large'
+EMBEDDING_MODEL='/models/multilingual-e5-large'
 #EMBEDDING_MODEL='jinaai/jina-embeddings-v3'
 
 GIGA_CHAT_USER_ID=os.environ.get('GIGA_CHAT_USER_ID')

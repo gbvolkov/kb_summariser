@@ -98,7 +98,7 @@ def dicts_to_documents(terms_definitions: List[Dict[str, str]]) -> List[Document
 
 t_d_docs = dicts_to_documents(t_and_d)
 
-embeddings = HuggingFaceEmbeddings(model_name='models/multilingual-e5-large')
+embeddings = HuggingFaceEmbeddings(model_name='/models/multilingual-e5-large')
 t_d_vs = FAISS.from_documents(t_d_docs, embeddings)
 
 

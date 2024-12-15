@@ -53,7 +53,7 @@ DISTANCE_TRESHOLD = 0.8
 
 #RERANKER = RAGPretrainedModel.from_pretrained("colbert-ir/colbertv2.0") #Does not work on Windows. Use Jina instead.
 #RERANKER = JinaRerank()
-reranker_model = HuggingFaceCrossEncoder(model_name="models/bge-reranker-large")
+reranker_model = HuggingFaceCrossEncoder(model_name="/models/bge-reranker-large")
 RERANKER = CrossEncoderReranker(model=reranker_model, top_n=3)
 
 
@@ -579,7 +579,7 @@ class RAGAssistantLocal(RAGAssistant):
         return self.truncate_input(context, available_tokens)
 
 class RAGAssistantGGUF(RAGAssistantLocal):
-    def __init__(self, system_prompt, kkb_path, model_name='models/mistral-large-instruct-2411-Q4_K_M', output_parser = BaseOutputParser):
+    def __init__(self, system_prompt, kkb_path, model_name='/models/mistral-large-instruct-2411-Q4_K_M', output_parser = BaseOutputParser):
         super().__init__(system_prompt, kkb_path, model_name, output_parser)
         
 
