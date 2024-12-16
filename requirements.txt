@@ -30,3 +30,4 @@ faiss-cpu
 nltk
 
 json-repair
+git+https://github.com/gbvolkov/AIAssistantsLibPackage.git

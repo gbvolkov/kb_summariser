@@ -1,6 +1,6 @@
 import config
-from assistants.json_assistants import JSONAssistantYA, JSONAssistantSber, JSONAssistantGPT, JSONAssistantMistralAI
-from assistants.simple_assistants import SimpleAssistantSber, SimpleAssistantGPT
+
+from AIAssistantsLib.assistants import JSONAssistantYA, JSONAssistantSber, JSONAssistantGPT, JSONAssistantMistralAI, SimpleAssistantSber, SimpleAssistantGPT
 
 from pydantic import BaseModel, Field
 from typing import List, Any, Optional, Dict, Tuple

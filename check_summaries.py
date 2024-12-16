@@ -4,7 +4,7 @@ import re
 import os
 import config
 
-from assistants.simple_assistants import SimpleAssistantMistralAI, SimpleAssistantGPT, SimpleAssistantYA, SimpleAssistantSber
+from AIAssistantsLib.assistants import SimpleAssistantMistralAI, SimpleAssistantGPT, SimpleAssistantYA, SimpleAssistantSber
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
