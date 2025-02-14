@@ -142,36 +142,40 @@ def process_csv(input_path, output_path, chunk_size=4096, overlap=0.35, skiprows
         # Determine the chunk size and overlap size (35%)
         idx = 0 if skiprows is None else skiprows.stop
         for chunk in reader:
-            processed_df = pd.DataFrame()
-            refs = chunk['refs'].iloc[0]  # Access the value in the 'refs' column
-            refs = cleanup_refs_for_processing(refs)
+            try:
+                processed_df = pd.DataFrame()
+                refs = str(chunk['refs'].iloc[0])  # Access the value in the 'refs' column
+                refs = cleanup_refs_for_processing(refs)
 
-            if _len(refs, tokenizer) >= chunk_size:
-                sentences = sent_tokenize(refs, language='russian')
-                #text_chunks = chunk_sentences(sentences, max_chunk_size=chunk_size, overlap_size=chunk_size * overlap, tokenizer=tokenizer)
-                text_chunks = chunk_sentences(sentences, max_chunk_size=chunk_size, overlap=overlap, tokenizer=tokenizer)
-            else:
-                text_chunks = [refs]
-            for text_chunk in text_chunks:
-                summaries = summarise_text(text_chunk)
-                for summary in summaries:
-                    new_row = chunk.copy()
-                    if 'summary' in summary:
-                        solution = summary['summary']
-                    else:
-                        print(f"Error processing record {chunk['no'].iloc[0]}: No summary found.")
-                        sys.exit(-1)
-                    problem = f'{chunk['problem'].iloc[0]}: {summary['topic']}' if 'topic' in summary else chunk['problem'].iloc[0]
-                    new_row['solution'] = solution
-                    new_row['problem'] = problem
-                    new_row['refs'] = text_chunk
-                    #print(f'for Record NO: {chunk['no'].iloc[0]}: {problem}: {solution}')
-                    processed_df = pd.concat([processed_df, new_row], ignore_index=True)
-            processed_df.to_csv(output_path, mode='a', index=False, header=not pd.io.common.file_exists(output_path))
-            #print(chunk['no'].iloc[0])
-            with open('./data/summariser.idx', 'w', encoding='utf-8') as f:
-                f.write(f'{idx}')
-            idx += 1
+                if _len(refs, tokenizer) >= chunk_size:
+                    sentences = sent_tokenize(refs, language='russian')
+                    #text_chunks = chunk_sentences(sentences, max_chunk_size=chunk_size, overlap_size=chunk_size * overlap, tokenizer=tokenizer)
+                    text_chunks = chunk_sentences(sentences, max_chunk_size=chunk_size, overlap=overlap, tokenizer=tokenizer)
+                else:
+                    text_chunks = [refs]
+                for text_chunk in text_chunks:
+                    summaries = summarise_text(text_chunk)
+                    for summary in summaries:
+                        new_row = chunk.copy()
+                        if 'summary' in summary:
+                            solution = summary['summary']
+                        else:
+                            print(f"Error processing record {chunk['no'].iloc[0]}: No summary found.")
+                            sys.exit(-1)
+                        problem = f'{chunk['problem'].iloc[0]}: {summary['topic']}' if 'topic' in summary else chunk['problem'].iloc[0]
+                        new_row['solution'] = solution
+                        new_row['problem'] = problem
+                        new_row['refs'] = text_chunk
+                        #print(f'for Record NO: {chunk['no'].iloc[0]}: {problem}: {solution}')
+                        processed_df = pd.concat([processed_df, new_row], ignore_index=True)
+                processed_df.to_csv(output_path, mode='a', index=False, header=not pd.io.common.file_exists(output_path))
+                #print(chunk['no'].iloc[0])
+                with open('./data/summariser.idx', 'w', encoding='utf-8') as f:
+                    f.write(f'{idx}')
+                idx += 1
+            except Exception as e:
+                print(f"Error processing record {chunk['no'].iloc[0]}: {e}")
+                continue
 
 async def main():
     idx = 1

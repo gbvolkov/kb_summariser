@@ -1,10 +1,11 @@
 import config
 
-from AIAssistantsLib.assistants import JSONAssistantYA, JSONAssistantSber, JSONAssistantGPT, JSONAssistantMistralAI, SimpleAssistantSber, SimpleAssistantGPT
+from AIAssistantsLib.assistants import JSONAssistantYA, JSONAssistantSber, JSONAssistantGPT, JSONAssistantMistralAI, SimpleAssistantSber, SimpleAssistantGPT, SimpleAssistantMistralAI
 
 from pydantic import BaseModel, Field
 from typing import List, Any, Optional, Dict, Tuple
 
+import time
 import pandas as pd
 import re
 import os
@@ -16,7 +17,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import JsonOutputParser
 
-os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_TRACING_V2"] = "false"
 
 
 
@@ -128,7 +129,7 @@ def get_summaries_generator():
     #Creating vectore store for terms and definitions
     t_d_vs = FAISS.from_documents(dicts_to_documents(extract_terms_definitions(glossary)), embeddings)
 
-    sber_assistant = SimpleAssistantSber(prompt)
+    sber_assistant = SimpleAssistantMistralAI(prompt)
     structured = JSONAssistantMistralAI(Terms)
     structured_gpt = JSONAssistantGPT(Terms)
     gpt_assistant = SimpleAssistantGPT(prompt)
@@ -158,12 +159,22 @@ def get_summaries_generator():
             "query": cleaned_refs
         }
         # Generates list of topics and summaries
+        ctry  = 3
+        delay  = 1
+        while ctry > 0:
+            try:
+                summary_txt = sber_assistant.ask_question(query)
+                summary = parser.parse(summary_txt)
+                return summary
+            except Exception as e:
+                time.sleep(delay)
+                delay = delay * 3
+                ctry = ctry - 1
         try:
             summary_txt = gpt_assistant.ask_question(query)
             summary = parser.parse(summary_txt)
-        except Exception as e:
-            summary_txt = gpt_assistant.ask_question(query)
-            summary = parser.parse(summary_txt)
+        except:
+            summary = query[:256]
         return summary
     
     return generate_summary
