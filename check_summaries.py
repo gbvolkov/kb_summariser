@@ -6,7 +6,7 @@ import config
 
 from AIAssistantsLib.assistants import SimpleAssistantMistralAI, SimpleAssistantGPT, SimpleAssistantYA, SimpleAssistantSber
 
-os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_TRACING_V2"] = "false"
 
 def cleanup_text(text: str):
     text = text.replace('Загрузка, пожалуйста подождите.', '')
@@ -24,25 +24,27 @@ with pd.read_csv('./data/articles_data_summ_cleaned.csv', chunksize=1, encoding=
     for chunk in reader:
         row_index = chunk.index[0]
         refs = chunk['refs'].iloc[0]
-        no = chunk['no'].iloc[0]
-        problem = chunk['problem'].iloc[0]
-        cleaned_refs = cleanup_text(refs)
-        query = {
-            "query": cleaned_refs
-        }
-        if prev_refs != refs:
-            validation = checker.ask_question(query=query)
-            prev_refs = refs
-        validated_row = chunk.copy()
-        validated_row['validated'] = validation
-        validated_row.to_csv(
-                './data/articles_data_summ_preprod.csv',
-                mode='w' if write_header else 'a',
-                header=write_header,
-                index=False
-            )
-        write_header = False
-        #print(f'{row_index} {no}-{problem}: {validation}')
+        if refs and type(refs) == str:
+            no = chunk['no'].iloc[0]
+            problem = chunk['problem'].iloc[0]
+            cleaned_refs = cleanup_text(refs)
+            query = {
+                "query": cleaned_refs
+            }
+            if prev_refs != refs:
+                validation = checker.ask_question(query=query)
+                prev_refs = refs
+            validated_row = chunk.copy()
+            validated_row['validated'] = validation
+            validated_row.to_csv(
+                    './data/articles_data_summ_preprod.csv',
+                    mode='w' if write_header else 'a',
+                    header=write_header,
+                    index=False
+                )
+            write_header = False
+        else:
+            print(f'Not updated{row_index}')
         idx += 1
 
 
